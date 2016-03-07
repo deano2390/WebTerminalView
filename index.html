@@ -1,6 +1,6 @@
 <html>
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1">a
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 body {
     color: #00FF00;
@@ -18,10 +18,6 @@ p {
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
 <script>
 
-String.prototype.replaceLast = function (what, replacement) {
-    return this.split(' ').reverse().join(' ').replace(new RegExp(what), replacement).split(' ').reverse().join(' ');
-};
-
 var terminal;
 var block = "&#9608;";
 var lines = [];
@@ -32,10 +28,10 @@ $(document).ready(function() {
 	lines.push(["name", "Dean Wild"]);
 	lines.push(["occupation", "Software Engineer"]);
 	lines.push(["location", "Oxford, United Kingdom"]);
-	lines.push(["skills", "Android, Java, .NET, HTML + Javascript ..."]);
+	lines.push(["skills", "Android, Java, C#, .NET, Xamarin, HTML + JS, Node.js, Cordova"]);
 	lines.push(["education", "1st Class BEng Degree, Computer Systems Engineering, University of Kent"]);
-	lines.push(["hobbies", "cycling, movies, travel, food, being awesome"]);
-	lines.push(["email", "dw86@kent.ac.uk"]);
+	lines.push(["hobbies", "cycling, movies, travel, cooking, cars, electronics"]);
+	lines.push(["email", "<a href='mailto:dw86@kent.ac.uk' style='color: #00FF00'>dw86@kent.ac.uk</a>"]);
 	lines.push(["phone", "07939684921"]);
 	printNextCmd();
 
@@ -99,8 +95,10 @@ function printLn(){
 	
 	var text = nextCmd;
 	
+	var delay = 0;
+	
 	for (i = 0; i < text.length; i++) {		
-		var delay = i * 70;				
+		delay += randomIntFromInterval(1, 250);
 		var char = text.charAt(i);
 		var isLastChar = (i == text.length - 1);
 		printChar(delay, char, isLastChar);
@@ -119,6 +117,10 @@ function printChar(delay, char, isLastChar){
 		}
 			
 	 }, delay);	
+}
+
+function randomIntFromInterval(min,max){
+    return Math.floor(Math.random()*(max-min+1)+min);
 }
 
 function onCmdFinished(){
