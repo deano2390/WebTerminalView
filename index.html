@@ -64,7 +64,8 @@ function outputFinished(){
 function enableKeyboardEntry(){
 
 	$(document).keydown(function(event) { 
-		if(event.which == 8){
+		if(event.which == 8){ // backspace
+			event.preventDefault(); // don't navigate back
 			keyEvent(event.which);
 		}			  
 	});
