@@ -16,11 +16,15 @@ p {
 }
 </style>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+
 <script>
 
 var terminal;
 var block = "&#9608;";
 var lines = [];
+
+var currentCommand = 0;
+
 
 $(document).ready(function() {
 	terminal = $("#terminal");	
@@ -33,31 +37,95 @@ $(document).ready(function() {
 	lines.push(["hobbies", "cycling, movies, travel, cooking, cars, electronics"]);
 	lines.push(["email", "<a href='mailto:dw86@kent.ac.uk' style='color: #00FF00'>dw86@kent.ac.uk</a>"]);
 	lines.push(["phone", "07939684921"]);
-	printNextCmd();
-
+	lines.push(["help", "command list: name, occupation, location, skills, education, hobbies, email, phone"]);	
+	printNextCmd();	
+		
 });
+
+var keyboardEnabled = false;
+function outputFinished(){	
+	if(!keyboardEnabled){
+		keyboardEnabled = true;
+		enableKeyboardEntry();
+	}
+}
+
+function enableKeyboardEntry(){
+
+	$(document).keydown(function(event) { 
+		if(event.which == 8){
+			keyEvent(event.which);
+		}			  
+	});
+	
+	$(document).keypress(function(event) {
+		keyEvent(event.which);
+	});	
+}
+
+var userCommand = "";
+
+function keyEvent(keyCode){
+	switch(keyCode){
+		
+	case 8: // backspace
+		userCommand = userCommand.slice(0, -1);
+		removeLastChar();
+		break;			
+	case 13: // enter
+		executeUserCommand();
+		break;			
+	default:
+		var newChar = String.fromCharCode(event.which);
+		userCommand += newChar;
+  		appendChar(newChar);
+		break;
+  }
+}
+
+function executeUserCommand(){
+	
+	nextResponse = userCommand + ": command not found, type 'help' for command list";
+	
+	for (i = 0; i < lines.length; i++) {
+		if(userCommand == lines[i][0]){
+			nextResponse = lines[i][1];		
+		}
+	}
+		
+	userCommand = "";
+	onCmdFinished();
+	
+
+}
 
 var nextCmd, nextResponse;
 function printNextCmd(){
-	if(lines.length > 0){
-		var pair = lines.shift();
+	if(currentCommand < lines.length - 1){
+		var pair = lines[currentCommand];
 		nextCmd = pair[0];
 		nextResponse = pair[1];
+		currentCommand++;
 		setTimeout(printLn, 1000);
+	}else{
+		outputFinished();
 	}	
 }
 
 
-var cursorFlashID;
+var cursorFlashID = -1;
 
 function startCursorFlash(){
-	addBlock();
-	cursorFlashID = setInterval(flashCursor, 500);	
+	if(cursorFlashID == -1){
+		addBlock();
+		cursorFlashID = setInterval(flashCursor, 500);	
+	}
 }
 
 function pauseCursorFlash(){
 	clearInterval(cursorFlashID);
 	addBlock();
+	cursorFlashID = -1;
 }
 
 var hasBlock = false;
@@ -101,22 +169,36 @@ function printLn(){
 		delay += randomIntFromInterval(1, 250);
 		var char = text.charAt(i);
 		var isLastChar = (i == text.length - 1);
-		printChar(delay, char, isLastChar);
+		printCharWithDelay(delay, char, isLastChar);
 	}	
 }
 
 
-function printChar(delay, char, isLastChar){
+function printCharWithDelay(delay, char, isLastChar){
 	setTimeout(function(){
-		var newText = terminal.html();	
-		newText = newText.slice(0, -1);
-		terminal.html(newText + char + block);		
+
+		appendChar(char);
 		
 		if(isLastChar){
 			setTimeout(onCmdFinished, 500);
 		}
 			
 	 }, delay);	
+}
+
+function appendChar(newChar){
+	removeBlock();
+	var newText = terminal.html();	
+	terminal.html(newText + newChar);		
+	addBlock();	
+}
+
+function removeLastChar(){
+	removeBlock();
+	var newText = terminal.html();	
+	newText = newText.slice(0, -1);
+	terminal.html(newText);	
+	addBlock();		
 }
 
 function randomIntFromInterval(min,max){
@@ -131,11 +213,15 @@ function onCmdFinished(){
 }
 
 function printNextResponse(){
+	printResponse(nextResponse);
+	onResponseFinished();
+}
+
+function printResponse(line){
 	removeBlock();
 	var newText = terminal.html();	
-	terminal.html(newText +  "-bash:&nbsp;" + nextResponse);
+	terminal.html(newText +  "-bash:&nbsp;" + line);
 	addBlock();	
-	setTimeout(onResponseFinished, 0);
 }
 
 function onResponseFinished(){
@@ -144,8 +230,7 @@ function onResponseFinished(){
 	var newText = terminal.html();	
 	terminal.html(newText + "$&nbsp;");
 	startCursorFlash();
-	printNextCmd();	
-	
+	printNextCmd();		
 }
 
 function addNewLine(){
