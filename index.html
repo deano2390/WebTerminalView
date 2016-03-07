@@ -1,0 +1,161 @@
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">a
+<style>
+body {
+    color: #00FF00;
+}
+
+p {
+	font-family: 'Courier New', Courier, 'Lucida Sans Typewriter', 'Lucida Typewriter', monospace;
+	font-size: 14px;
+	font-style: normal;
+	font-variant: normal;
+	font-weight: 400;
+	line-height: 20px;
+}
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+<script>
+
+String.prototype.replaceLast = function (what, replacement) {
+    return this.split(' ').reverse().join(' ').replace(new RegExp(what), replacement).split(' ').reverse().join(' ');
+};
+
+var terminal;
+var block = "&#9608;";
+var lines = [];
+
+$(document).ready(function() {
+	terminal = $("#terminal");	
+	startCursorFlash();	
+	lines.push(["name", "Dean Wild"]);
+	lines.push(["occupation", "Software Engineer"]);
+	lines.push(["location", "Oxford, United Kingdom"]);
+	lines.push(["skills", "Android, Java, .NET, HTML + Javascript ..."]);
+	lines.push(["education", "1st Class BEng Degree, Computer Systems Engineering, University of Kent"]);
+	lines.push(["hobbies", "cycling, movies, travel, food, being awesome"]);
+	lines.push(["email", "dw86@kent.ac.uk"]);
+	lines.push(["phone", "07939684921"]);
+	printNextCmd();
+
+});
+
+var nextCmd, nextResponse;
+function printNextCmd(){
+	if(lines.length > 0){
+		var pair = lines.shift();
+		nextCmd = pair[0];
+		nextResponse = pair[1];
+		setTimeout(printLn, 1000);
+	}	
+}
+
+
+var cursorFlashID;
+
+function startCursorFlash(){
+	addBlock();
+	cursorFlashID = setInterval(flashCursor, 500);	
+}
+
+function pauseCursorFlash(){
+	clearInterval(cursorFlashID);
+	addBlock();
+}
+
+var hasBlock = false;
+function flashCursor(){
+		
+	if(hasBlock){
+		removeBlock();
+	}else{
+		addBlock();
+	}
+}
+
+function addBlock(){
+	if(!hasBlock){
+	var newText = terminal.html();	
+	newText += block;
+	terminal.html(newText);	
+	hasBlock = true;
+}
+}
+
+function removeBlock(){
+	if(hasBlock){
+	var newText = terminal.html();	
+	newText = newText.slice(0, -1);
+	terminal.html(newText);		
+	hasBlock = removeBlock;
+	hasBlock = false;
+}
+}
+
+function printLn(){
+	
+	pauseCursorFlash();
+	
+	var text = nextCmd;
+	
+	for (i = 0; i < text.length; i++) {		
+		var delay = i * 70;				
+		var char = text.charAt(i);
+		var isLastChar = (i == text.length - 1);
+		printChar(delay, char, isLastChar);
+	}	
+}
+
+
+function printChar(delay, char, isLastChar){
+	setTimeout(function(){
+		var newText = terminal.html();	
+		newText = newText.slice(0, -1);
+		terminal.html(newText + char + block);		
+		
+		if(isLastChar){
+			setTimeout(onCmdFinished, 500);
+		}
+			
+	 }, delay);	
+}
+
+function onCmdFinished(){
+	removeBlock();
+	addNewLine();
+	addBlock();
+	setTimeout(printNextResponse, 100);
+}
+
+function printNextResponse(){
+	removeBlock();
+	var newText = terminal.html();	
+	terminal.html(newText +  "-bash:&nbsp;" + nextResponse);
+	addBlock();	
+	setTimeout(onResponseFinished, 0);
+}
+
+function onResponseFinished(){
+	removeBlock();
+	addNewLine();
+	var newText = terminal.html();	
+	terminal.html(newText + "$&nbsp;");
+	startCursorFlash();
+	printNextCmd();	
+	
+}
+
+function addNewLine(){
+	var oldText = terminal.html();	
+	terminal.html(oldText + "<br/>");
+}
+
+</script>
+</head>
+<body bgcolor="black">
+<p id="terminal">
+$
+</p>
+</body>
+</html>
