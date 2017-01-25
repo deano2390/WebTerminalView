@@ -1,262 +1,267 @@
 <html>
+
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<style>
-body {
-    color: #00FF00;
-}
+    <meta name="google-site-verification" content="OEXC1aMEZKrJORyHpMg7LKrV4BRo0Eb8QgXZAPxkvQ0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            color: #00FF00;
+        }
+        
+        p {
+            font-family: 'Courier New', Courier, 'Lucida Sans Typewriter', 'Lucida Typewriter', monospace;
+            font-size: 14px;
+            font-style: normal;
+            font-variant: normal;
+            font-weight: 400;
+            line-height: 20px;
+        }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
 
-p {
-	font-family: 'Courier New', Courier, 'Lucida Sans Typewriter', 'Lucida Typewriter', monospace;
-	font-size: 14px;
-	font-style: normal;
-	font-variant: normal;
-	font-weight: 400;
-	line-height: 20px;
-}
-</style>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+    <script>
+        var terminal;
+        var block = "&#9608;";
+        var lines = [];
 
-<script>
-
-var terminal;
-var block = "&#9608;";
-var lines = [];
-
-var currentCommand = 0;
-
-
-$(document).ready(function() {
-	terminal = $("#terminal");	
-	startCursorFlash();	
-	lines.push(["name", "Dean Wild"]);
-	lines.push(["occupation", "Software Engineer"]);
-	lines.push(["location", "Belfast, United Kingdom"]);
-	lines.push(["skills", "Android, Java, C#, .NET, Xamarin, HTML + JS, Node.js, Cordova"]);
-	lines.push(["education", "1st Class BEng Degree, Computer Systems Engineering, University of Kent"]);
-	lines.push(["hobbies", "cycling, movies, travel, cooking, cars, electronics"]);
-	lines.push(["email", "<a href='mailto:dw86@kent.ac.uk' style='color: #00FF00'>dw86@kent.ac.uk</a>"]);
-	lines.push(["phone", "07939684921"]);
-	lines.push(["git pull", "<a href='https://github.com/deano2390' style='color: #00FF00' target='_blank'>https://github.com/deano2390</a>"]);
-	lines.push(["stack", "<a href='http://stackoverflow.com/users/1049903/dean-wild' style='color: #00FF00' target='_blank'>http://stackoverflow.com/users/1049903/dean-wild</a>"]);
-	lines.push(["linkedin", "<a href='https://www.linkedin.com/in/deanwild' style='color: #00FF00' target='_blank'>https://www.linkedin.com/in/deanwild</a>"]);
-	
-	var commandList = "command list:<br/>&nbsp;&nbsp;&nbsp;&nbsp;";
-	
-	for (i = 0; i < lines.length; i++) {
-		commandList += lines[i][0];
-		if(i < lines.length-1) commandList += ",&nbsp;";
-	}
-	
-	lines.push(["help", commandList]);	
-	
-	printNextCmd();	
-		
-});
-
-var keyboardEnabled = false;
-function outputFinished(){	
-	if(!keyboardEnabled){
-		keyboardEnabled = true;
-		enableKeyboardEntry();
-	}
-}
-
-function enableKeyboardEntry(){
-
-	$(document).keydown(function(event) { 
-		if(event.which == 8){ // backspace
-			event.preventDefault(); // don't navigate back
-			keyEvent(event.which);
-		}			  
-	});
-	
-	$(document).keypress(function(event) {
-		keyEvent(event.which);
-	});	
-}
-
-var userCommand = "";
-
-function keyEvent(keyCode){
-	switch(keyCode){
-		
-	case 8: // backspace
-		userCommand = userCommand.slice(0, -1);
-		removeLastChar();
-		break;			
-	case 13: // enter
-		executeUserCommand();
-		break;			
-	default:
-		var newChar = String.fromCharCode(event.which);
-		userCommand += newChar;
-  		appendChar(newChar);
-		break;
-  }
-}
-
-function executeUserCommand(){
-	
-	nextResponse = userCommand + ": command not found, type 'help' for command list";
-	
-	for (i = 0; i < lines.length; i++) {
-		if(userCommand == lines[i][0]){
-			nextResponse = lines[i][1];		
-		}
-	}
-		
-	userCommand = "";
-	onCmdFinished();
-	
-
-}
-
-var nextCmd, nextResponse;
-function printNextCmd(){
-	if(currentCommand < lines.length - 1){
-		var pair = lines[currentCommand];
-		nextCmd = pair[0];
-		nextResponse = pair[1];
-		currentCommand++;
-		setTimeout(printLn, 1000);
-	}else{
-		outputFinished();
-	}	
-}
+        var currentCommand = 0;
 
 
-var cursorFlashID = -1;
+        $(document).ready(function () {
+            terminal = $("#terminal");
+            startCursorFlash();
+            lines.push(["name", "Dean Wild"]);
+            lines.push(["occupation", "Software Engineer"]);
+            lines.push(["location", "Belfast, United Kingdom"]);
+            lines.push(["skills", "Android, Java, C#, .NET, Xamarin, HTML + JS, Node.js, Cordova"]);
+            lines.push(["education", "1st Class BEng Degree, Computer Systems Engineering, University of Kent"]);
+            lines.push(["hobbies", "cycling, movies, travel, cooking, cars, electronics"]);
+            lines.push(["email", "<a href='mailto:me@deanwild.co.uk' style='color: #00FF00'>me@deanwild.co.uk</a>"]);
+            lines.push(["phone", "07939684921"]);
+            lines.push(["git pull", "<a href='https://github.com/deano2390' style='color: #00FF00' target='_blank'>https://github.com/deano2390</a>"]);
+            lines.push(["stack", "<a href='http://stackoverflow.com/users/1049903/dean-wild' style='color: #00FF00' target='_blank'>http://stackoverflow.com/users/1049903/dean-wild</a>"]);
+            lines.push(["linkedin", "<a href='https://www.linkedin.com/in/deanwild' style='color: #00FF00' target='_blank'>https://www.linkedin.com/in/deanwild</a>"]);
 
-function startCursorFlash(){
-	if(cursorFlashID == -1){
-		addBlock();
-		cursorFlashID = setInterval(flashCursor, 500);	
-	}
-}
+            var commandList = "command list:<br/>&nbsp;&nbsp;&nbsp;&nbsp;";
 
-function pauseCursorFlash(){
-	clearInterval(cursorFlashID);
-	addBlock();
-	cursorFlashID = -1;
-}
+            for (i = 0; i < lines.length; i++) {
+                commandList += lines[i][0];
+                if (i < lines.length - 1) commandList += ",&nbsp;";
+            }
 
-var hasBlock = false;
-function flashCursor(){
-		
-	if(hasBlock){
-		removeBlock();
-	}else{
-		addBlock();
-	}
-}
+            lines.push(["help", commandList]);
 
-function addBlock(){
-	if(!hasBlock){
-	var newText = terminal.html();	
-	newText += block;
-	terminal.html(newText);	
-	hasBlock = true;
-}
-}
+            printNextCmd();
 
-function removeBlock(){
-	if(hasBlock){
-	var newText = terminal.html();	
-	newText = newText.slice(0, -1);
-	terminal.html(newText);		
-	hasBlock = removeBlock;
-	hasBlock = false;
-}
-}
+        });
 
-function printLn(){
-	
-	pauseCursorFlash();
-	
-	var text = nextCmd;
-	
-	var delay = 0;
-	
-	for (i = 0; i < text.length; i++) {		
-		delay += randomIntFromInterval(1, 250);
-		var char = text.charAt(i);
-		var isLastChar = (i == text.length - 1);
-		printCharWithDelay(delay, char, isLastChar);
-	}	
-}
+        var keyboardEnabled = false;
+
+        function outputFinished() {
+            if (!keyboardEnabled) {
+                keyboardEnabled = true;
+                enableKeyboardEntry();
+            }
+        }
+
+        function enableKeyboardEntry() {
+
+            $(document).keydown(function (event) {
+                if (event.which == 8) { // backspace
+                    event.preventDefault(); // don't navigate back
+                    keyEvent(event.which);
+                }
+            });
+
+            $(document).keypress(function (event) {
+                keyEvent(event.which);
+            });
+        }
+
+        var userCommand = "";
+
+        function keyEvent(keyCode) {
+            switch (keyCode) {
+
+            case 8: // backspace
+                userCommand = userCommand.slice(0, -1);
+                removeLastChar();
+                break;
+            case 13: // enter
+                executeUserCommand();
+                break;
+            default:
+                var newChar = String.fromCharCode(event.which);
+                userCommand += newChar;
+                appendChar(newChar);
+                break;
+            }
+        }
+
+        function executeUserCommand() {
+
+            nextResponse = userCommand + ": command not found, type 'help' for command list";
+
+            for (i = 0; i < lines.length; i++) {
+                if (userCommand == lines[i][0]) {
+                    nextResponse = lines[i][1];
+                }
+            }
+
+            userCommand = "";
+            onCmdFinished();
 
 
-function printCharWithDelay(delay, char, isLastChar){
-	setTimeout(function(){
+        }
 
-		appendChar(char);
-		
-		if(isLastChar){
-			setTimeout(onCmdFinished, 500);
-		}
-			
-	 }, delay);	
-}
+        var nextCmd, nextResponse;
 
-function appendChar(newChar){
-	removeBlock();
-	var newText = terminal.html();	
-	terminal.html(newText + newChar);		
-	addBlock();	
-}
+        function printNextCmd() {
+            if (currentCommand < lines.length - 1) {
+                var pair = lines[currentCommand];
+                nextCmd = pair[0];
+                nextResponse = pair[1];
+                currentCommand++;
+                setTimeout(printLn, 1000);
+            } else {
+                outputFinished();
+            }
+        }
 
-function removeLastChar(){
-	removeBlock();
-	var newText = terminal.html();	
-	newText = newText.slice(0, -1);
-	terminal.html(newText);	
-	addBlock();		
-}
 
-function randomIntFromInterval(min,max){
-    return Math.floor(Math.random()*(max-min+1)+min);
-}
+        var cursorFlashID = -1;
 
-function onCmdFinished(){
-	removeBlock();
-	addNewLine();
-	addBlock();
-	setTimeout(printNextResponse, 100);
-}
+        function startCursorFlash() {
+            if (cursorFlashID == -1) {
+                addBlock();
+                cursorFlashID = setInterval(flashCursor, 500);
+            }
+        }
 
-function printNextResponse(){
-	printResponse(nextResponse);
-	onResponseFinished();
-}
+        function pauseCursorFlash() {
+            clearInterval(cursorFlashID);
+            addBlock();
+            cursorFlashID = -1;
+        }
 
-function printResponse(line){
-	removeBlock();
-	var newText = terminal.html();	
-	terminal.html(newText +  "-bash:&nbsp;" + line);
-	addBlock();	
-}
+        var hasBlock = false;
 
-function onResponseFinished(){
-	removeBlock();
-	addNewLine();
-	var newText = terminal.html();	
-	terminal.html(newText + "$&nbsp;");
-	startCursorFlash();
-	printNextCmd();		
-}
+        function flashCursor() {
 
-function addNewLine(){
-	var oldText = terminal.html();	
-	terminal.html(oldText + "<br/>");
-	window.scrollTo(0,document.body.scrollHeight);
-}
+            if (hasBlock) {
+                removeBlock();
+            } else {
+                addBlock();
+            }
+        }
 
-</script>
+        function addBlock() {
+            if (!hasBlock) {
+                var newText = terminal.html();
+                newText += block;
+                terminal.html(newText);
+                hasBlock = true;
+            }
+        }
+
+        function removeBlock() {
+            if (hasBlock) {
+                var newText = terminal.html();
+                newText = newText.slice(0, -1);
+                terminal.html(newText);
+                hasBlock = removeBlock;
+                hasBlock = false;
+            }
+        }
+
+        function printLn() {
+
+            pauseCursorFlash();
+
+            var text = nextCmd;
+
+            var delay = 0;
+
+            for (i = 0; i < text.length; i++) {
+                delay += randomIntFromInterval(1, 250);
+                var char = text.charAt(i);
+                var isLastChar = (i == text.length - 1);
+                printCharWithDelay(delay, char, isLastChar);
+            }
+        }
+
+
+        function printCharWithDelay(delay, char, isLastChar) {
+            setTimeout(function () {
+
+                appendChar(char);
+
+                if (isLastChar) {
+                    setTimeout(onCmdFinished, 500);
+                }
+
+            }, delay);
+        }
+
+        function appendChar(newChar) {
+            removeBlock();
+            var newText = terminal.html();
+            terminal.html(newText + newChar);
+            addBlock();
+        }
+
+        function removeLastChar() {
+            removeBlock();
+            var newText = terminal.html();
+            newText = newText.slice(0, -1);
+            terminal.html(newText);
+            addBlock();
+        }
+
+        function randomIntFromInterval(min, max) {
+            return Math.floor(Math.random() * (max - min + 1) + min);
+        }
+
+        function onCmdFinished() {
+            removeBlock();
+            addNewLine();
+            addBlock();
+            setTimeout(printNextResponse, 100);
+        }
+
+        function printNextResponse() {
+            printResponse(nextResponse);
+            onResponseFinished();
+        }
+
+        function printResponse(line) {
+            removeBlock();
+            var newText = terminal.html();
+            terminal.html(newText + "-bash:&nbsp;" + line);
+            addBlock();
+        }
+
+        function onResponseFinished() {
+            removeBlock();
+            addNewLine();
+            var newText = terminal.html();
+            terminal.html(newText + "$&nbsp;");
+            startCursorFlash();
+            printNextCmd();
+        }
+
+        function addNewLine() {
+            var oldText = terminal.html();
+            terminal.html(oldText + "<br/>");
+            window.scrollTo(0, document.body.scrollHeight);
+        }
+    </script>
 </head>
+
 <body bgcolor="black">
-<p id="terminal">
-$
-</p>
+    <p id="terminal">
+        $
+    </p>
 </body>
+
 </html>
